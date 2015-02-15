@@ -3,7 +3,7 @@ from datetime import datetime
 import pytz
 from .factories import RestaurantFactory, TableFactory, BookingFactory
 from restaurants import booking
-from restaurants.models import Booking
+
 
 class ModelsTest(TestCase):
     def setUp(self):
