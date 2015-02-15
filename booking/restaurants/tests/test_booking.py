@@ -58,3 +58,11 @@ class ModelsTest(TestCase):
         diners = booking.get_expected_diners(self.restaurant_1,
             datetime(2015, 2, 14, tzinfo=pytz.UTC))
         self.assertEqual(diners, 6)
+
+    def test_book_table_for_2_hours(self):
+        booking_response = booking.book_restaurant_table(
+            restaurant=self.restaurant_1,
+            booking_date_time=datetime(2015, 2, 14, 21, 0, tzinfo=pytz.UTC),
+            people=2,
+            minutes_slot=120)
+        self.assertEqual(booking_response['table'], self.restaurant_1_table_1.id)
