@@ -4,8 +4,8 @@ from .models import Table, Booking
 def book_restaurant_table(restaurant, people, booking_date_time):
     pass
 
-def get_first_table_available(restaurant, booking_date_time, people):
-    delta = timedelta(seconds=60*90)  # 1,5 hours time delta
+def get_first_table_available(restaurant, booking_date_time, people, minutes_slot=90):
+    delta = timedelta(seconds=60*minutes_slot)
     l_bound_time = booking_date_time - delta
     u_bound_time = booking_date_time + delta
 
@@ -15,7 +15,7 @@ def get_first_table_available(restaurant, booking_date_time, people):
 
     tables = Table.objects.filter(restaurant=restaurant,
         restaurant__opening_time__lte=booking_date_time.hour,
-        restaurant__closing_time__gte=booking_date_time.hour+1.5,
+        restaurant__closing_time__gte=booking_date_time.hour+(minutes_slot / float(60)),
         size__gte=people).exclude(id__in=tables_booked_ids).order_by('size')
 
     if tables.count() == 0:
