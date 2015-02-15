@@ -3,3 +3,5 @@ argparse==1.2.1
 factory-boy==2.4.1
 wsgiref==0.1.2
 pytz==2014.10
+python-coveralls==2.5.0
+coverage==3.7.1
