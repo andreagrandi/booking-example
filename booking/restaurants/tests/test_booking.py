@@ -42,3 +42,10 @@ class ModelsTest(TestCase):
             booking_date_time=datetime(2015, 2, 14, 17, 0, tzinfo=pytz.UTC),
             people=2)
         self.assertEqual(table, None)
+
+    def test_book_first_available_table(self):
+        booking_response = booking.book_restaurant_table(
+            restaurant=self.restaurant_1,
+            booking_date_time=datetime(2015, 2, 14, 20, 0, tzinfo=pytz.UTC),
+            people=2)
+        self.assertEqual(booking_response['table'], self.restaurant_1_table_1.id)

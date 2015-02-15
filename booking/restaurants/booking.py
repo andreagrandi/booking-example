@@ -1,8 +1,15 @@
 from datetime import timedelta
 from .models import Table, Booking
 
-def book_restaurant_table(restaurant, people, booking_date_time):
-    pass
+def book_restaurant_table(restaurant, booking_date_time, people, minutes_slot=90):
+    table = get_first_table_available(restaurant, booking_date_time, people, minutes_slot)
+
+    if table:
+        booking = Booking(table=table, people=people, booking_date_time=booking_date_time)
+        booking.save()
+        return {'booking': booking.id, 'table': table.id}
+    else:
+        return None
 
 def get_first_table_available(restaurant, booking_date_time, people, minutes_slot=90):
     delta = timedelta(seconds=60*minutes_slot)
