@@ -49,3 +49,12 @@ class ModelsTest(TestCase):
             booking_date_time=datetime(2015, 2, 14, 20, 0, tzinfo=pytz.UTC),
             people=2)
         self.assertEqual(booking_response['table'], self.restaurant_1_table_1.id)
+
+    def test_get_expected_diners(self):
+        self.booking_2 = BookingFactory.create(
+            table=self.restaurant_1_table_1,
+            people=2,
+            booking_date_time=datetime(2015, 2, 14, 19, 0, tzinfo=pytz.UTC))
+        diners = booking.get_expected_diners(self.restaurant_1,
+            datetime(2015, 2, 14, tzinfo=pytz.UTC))
+        self.assertEqual(diners, 6)

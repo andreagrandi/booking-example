@@ -1,4 +1,5 @@
 from datetime import timedelta
+from django.db.models import Sum
 from .models import Table, Booking
 
 def book_restaurant_table(restaurant, booking_date_time, people, minutes_slot=90):
@@ -44,3 +45,14 @@ def get_first_table_available(restaurant, booking_date_time, people, minutes_slo
         return None
     else:
         return tables[0]
+
+def get_expected_diners(restaurant, booking_date):
+    """
+    Return the expected number of diners of a restaurant for a specific date.
+    """
+    diners = Booking.objects.filter(
+        table__restaurant=restaurant,
+        booking_date_time__year=booking_date.year,
+        booking_date_time__month=booking_date.month,
+        booking_date_time__day=booking_date.day).aggregate(Sum('people'))
+    return diners['people__sum']
