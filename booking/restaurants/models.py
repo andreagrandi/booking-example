@@ -16,4 +16,5 @@ class Table(models.Model):
 class Booking(models.Model):
     table = models.ForeignKey(Table)
     people = models.IntegerField()
-    booking_date_time = models.DateTimeField()
+    booking_date_time_start = models.DateTimeField()
+    booking_date_time_end = models.DateTimeField()
