@@ -29,11 +29,38 @@ class ModelsTest(TestCase):
             people=2)
         self.assertEqual(table.id, self.restaurant_1_table_1.id)
 
-    def test_get_first_table_available_unavailable(self):
+    def test_get_first_table_available_unavailable_1(self):
+        # The setup already books the 4 people table from 19:00 to 20:30
         table = booking.get_first_table_available(
             restaurant=self.restaurant_1,
             booking_date_time=datetime(2015, 2, 14, 20, 0, tzinfo=pytz.UTC),
             people=4)
+        self.assertEqual(table, None)
+
+    def test_get_first_table_available_unavailable_2(self):
+        # The setup already books the 4 people table from 19:00 to 20:30
+        table = booking.get_first_table_available(
+            restaurant=self.restaurant_1,
+            booking_date_time=datetime(2015, 2, 14, 18, 0, tzinfo=pytz.UTC),
+            people=4)
+        self.assertEqual(table, None)
+
+    def test_get_first_table_available_unavailable_3(self):
+        # The setup already books the 4 people table from 19:00 to 20:30
+        table = booking.get_first_table_available(
+            restaurant=self.restaurant_1,
+            booking_date_time=datetime(2015, 2, 14, 18, 0, tzinfo=pytz.UTC),
+            people=4,
+            minutes_slot=300)
+        self.assertEqual(table, None)
+
+    def test_get_first_table_available_unavailable_4(self):
+        # The setup already books the 4 people table from 19:00 to 20:30
+        table = booking.get_first_table_available(
+            restaurant=self.restaurant_1,
+            booking_date_time=datetime(2015, 2, 14, 19, 30, tzinfo=pytz.UTC),
+            people=4,
+            minutes_slot=30)
         self.assertEqual(table, None)
 
     def test_unavailable_tables_1_hour_before_closing(self):
