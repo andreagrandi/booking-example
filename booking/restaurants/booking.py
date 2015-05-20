@@ -31,24 +31,28 @@ def get_first_table_available(restaurant, booking_date_time, people, minutes_slo
 
     tables_booked_ids = []
 
+    # Exclude tables which start and end booking date includes requested initial booking date_time
     tables_booked = Booking.objects.filter(table__restaurant=restaurant,
         booking_date_time_start__lt=l_bound_time,
         booking_date_time_end__gt=l_bound_time).values('table')
     tables_booked_ids_temp = [x['table'] for x in tables_booked]
     tables_booked_ids = tables_booked_ids + tables_booked_ids_temp
 
+    # Exclude tables which start and end booking date includes requested ending booking date_time
     tables_booked = Booking.objects.filter(
         booking_date_time_start__lt=u_bound_time,
         booking_date_time_end__gt=u_bound_time).values('table')
     tables_booked_ids_temp = [x['table'] for x in tables_booked]
     tables_booked_ids = tables_booked_ids + tables_booked_ids_temp
 
+    # Exclude tables which booking slots is inside requested booking slot
     tables_booked = Booking.objects.filter(
         booking_date_time_start__gt=l_bound_time,
         booking_date_time_end__lt=u_bound_time).values('table')
     tables_booked_ids_temp = [x['table'] for x in tables_booked]
     tables_booked_ids = tables_booked_ids + tables_booked_ids_temp
 
+    # Exclude tables which include requested booking slot
     tables_booked = Booking.objects.filter(
         booking_date_time_start__lt=l_bound_time,
         booking_date_time_end__gt=u_bound_time).values('table')
