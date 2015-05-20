@@ -1,6 +1,11 @@
 # booking-example
 A restaurant table booking example in Python/Django
 
+# Running Tests
+
+    cd booking-example/booking/
+    ./manage.py test
+
 # Features implemented
 
 * store Restaurants, Tables and Bookings ( https://github.com/andreagrandi/booking-example/blob/master/booking/restaurants/models.py )
