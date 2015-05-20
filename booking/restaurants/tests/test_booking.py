@@ -1,5 +1,5 @@
 from django.test import TestCase
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 from .factories import RestaurantFactory, TableFactory, BookingFactory
 from restaurants import booking
@@ -10,10 +10,17 @@ class ModelsTest(TestCase):
         self.restaurant_1 = RestaurantFactory.create(opening_time=18, closing_time=23)
         self.restaurant_1_table_1 = TableFactory.create(restaurant=self.restaurant_1, size=2)
         self.restaurant_1_table_2 = TableFactory.create(restaurant=self.restaurant_1, size=4)
+
+        booking_date_time_start = datetime(2015, 2, 14, 19, 0, tzinfo=pytz.UTC)
+        minutes_slot = 90
+        delta = timedelta(seconds=60*minutes_slot)
+        booking_date_time_end = booking_date_time_start + delta
+
         self.booking_1 = BookingFactory.create(
             table=self.restaurant_1_table_2,
             people=4,
-            booking_date_time=datetime(2015, 2, 14, 19, 0, tzinfo=pytz.UTC))
+            booking_date_time_start=booking_date_time_start,
+            booking_date_time_end=booking_date_time_end)
 
     def test_get_first_table_available(self):
         table = booking.get_first_table_available(
@@ -51,10 +58,16 @@ class ModelsTest(TestCase):
         self.assertEqual(booking_response['table'], self.restaurant_1_table_1.id)
 
     def test_get_expected_diners(self):
+        booking_date_time_start = datetime(2015, 2, 14, 19, 0, tzinfo=pytz.UTC)
+        minutes_slot = 90
+        delta = timedelta(seconds=60*minutes_slot)
+        booking_date_time_end = booking_date_time_start + delta
+
         self.booking_2 = BookingFactory.create(
             table=self.restaurant_1_table_1,
             people=2,
-            booking_date_time=datetime(2015, 2, 14, 19, 0, tzinfo=pytz.UTC))
+            booking_date_time_start=booking_date_time_start,
+            booking_date_time_end=booking_date_time_end)
         diners = booking.get_expected_diners(self.restaurant_1,
             datetime(2015, 2, 14, tzinfo=pytz.UTC))
         self.assertEqual(diners, 6)

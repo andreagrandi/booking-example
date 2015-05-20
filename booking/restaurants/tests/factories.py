@@ -24,4 +24,5 @@ class BookingFactory(factory.DjangoModelFactory):
 
     table = factory.SubFactory(TableFactory)
     people = 3
-    booking_date_time = now()
+    booking_date_time_start = now()
+    booking_date_time_end = now()

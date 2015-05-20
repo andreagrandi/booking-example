@@ -10,7 +10,9 @@ def book_restaurant_table(restaurant, booking_date_time, people, minutes_slot=90
     table = get_first_table_available(restaurant, booking_date_time, people, minutes_slot)
 
     if table:
-        booking = Booking(table=table, people=people, booking_date_time=booking_date_time)
+        delta = timedelta(seconds=60*minutes_slot)
+        booking = Booking(table=table, people=people,
+            booking_date_time_start=booking_date_time, booking_date_time_end=booking_date_time + delta)
         booking.save()
         return {'booking': booking.id, 'table': table.id}
     else:
@@ -21,17 +23,37 @@ def get_first_table_available(restaurant, booking_date_time, people, minutes_slo
     This method returns the first available table of a restaurant, given a specific number of
     people and a booking date/time.
     """
-
     # I make sure to check if the tables are not already booked within the time slot required
     # by the new booking
     delta = timedelta(seconds=60*minutes_slot)
-    l_bound_time = booking_date_time - delta
+    l_bound_time = booking_date_time
     u_bound_time = booking_date_time + delta
 
-    # First I get a list of tables booked in that restaurant, within the given time range
+    tables_booked_ids = []
+
     tables_booked = Booking.objects.filter(table__restaurant=restaurant,
-        booking_date_time__gt=l_bound_time, booking_date_time__lt=u_bound_time).values('table')
-    tables_booked_ids = [x['table'] for x in tables_booked]
+        booking_date_time_start__lt=l_bound_time,
+        booking_date_time_end__gt=l_bound_time).values('table')
+    tables_booked_ids_temp = [x['table'] for x in tables_booked]
+    tables_booked_ids = tables_booked_ids + tables_booked_ids_temp
+
+    tables_booked = Booking.objects.filter(
+        booking_date_time_start__lt=u_bound_time,
+        booking_date_time_end__gt=u_bound_time).values('table')
+    tables_booked_ids_temp = [x['table'] for x in tables_booked]
+    tables_booked_ids = tables_booked_ids + tables_booked_ids_temp
+
+    tables_booked = Booking.objects.filter(
+        booking_date_time_start__gt=l_bound_time,
+        booking_date_time_end__lt=u_bound_time).values('table')
+    tables_booked_ids_temp = [x['table'] for x in tables_booked]
+    tables_booked_ids = tables_booked_ids + tables_booked_ids_temp
+
+    tables_booked = Booking.objects.filter(
+        booking_date_time_start__lt=l_bound_time,
+        booking_date_time_end__gt=u_bound_time).values('table')
+    tables_booked_ids_temp = [x['table'] for x in tables_booked]
+    tables_booked_ids = tables_booked_ids + tables_booked_ids_temp
 
     # Then I get a list of all the tables, of the needed size, available in that restaurant and
     # I exclude the previous list of unavailable tables. I order the list from the smaller table
@@ -52,7 +74,7 @@ def get_expected_diners(restaurant, booking_date):
     """
     diners = Booking.objects.filter(
         table__restaurant=restaurant,
-        booking_date_time__year=booking_date.year,
-        booking_date_time__month=booking_date.month,
-        booking_date_time__day=booking_date.day).aggregate(Sum('people'))
+        booking_date_time_start__year=booking_date.year,
+        booking_date_time_start__month=booking_date.month,
+        booking_date_time_start__day=booking_date.day).aggregate(Sum('people'))
     return diners['people__sum']
